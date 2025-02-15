@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 from django.http import HttpResponse, JsonResponse
-from .models import Member,UserLog
+from .models import Member, UserLog
 
 
 def index(request):
@@ -41,11 +41,18 @@ def member_reg(request):
         # 회원가입 로그 기록
         UserLog.objects.create(member=member, action="signup")
 
-        # 회원가입 완료 후 낙상방지 템플릿으로 이동
-        return render(request, "member/fall_prevention.html", {"member_name": name})
+        # 회원가입 완료 후 로그인 페이지로 리디렉션
+        context = {
+            "message": f"{member_id}로 회원가입이 완료되었습니다. 로그인 해주세요."
+        }
+        return render(request, "member/login.html", context)
+
+
 def member_login(request):
+    """로그인 기능"""
     if request.method == "GET":
         return render(request, 'member/login.html')
+    
     elif request.method == "POST":
         context = {}
 
@@ -57,29 +64,28 @@ def member_login(request):
         print(member_id + '/' + passwd)
         print(rs)
 
-        #if rs.exists():
         if rs is not None:
-
-            # OK - 로그인
+            # 로그인 성공
             request.session['m_id'] = member_id
             request.session['m_name'] = rs.name
 
             context['m_id'] = member_id
             context['m_name'] = rs.name
             context['message'] = rs.name + "님이 로그인하셨습니다."
-            return render(request, 'member/index.html', context)
+            
+            # 로그인 후 낙상방지 시스템 페이지로 이동
+            return render(request, "member/fall_prevention.html", context)
 
         else:
-
             context['message'] = "로그인 정보가 맞지않습니다.\\n\\n확인하신 후 다시 시도해 주십시오."
             return render(request, 'member/login.html', context)
-        
 
-        
 
 def member_logout(request):
+    """로그아웃 기능"""
     request.session.flush()
     return redirect('/member/')
+
 
 def fall_prevention(request):
     """낙상방지 시스템 페이지"""

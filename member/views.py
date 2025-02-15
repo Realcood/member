@@ -2,7 +2,7 @@ from django.shortcuts import render, redirect
 from django.views.decorators.csrf import csrf_exempt
 from datetime import datetime
 from django.http import HttpResponse, JsonResponse
-from .models import Member
+from .models import Member,UserLog
 
 
 def index(request):
@@ -81,3 +81,6 @@ def member_logout(request):
     request.session.flush()
     return redirect('/member/')
 
+def fall_prevention(request):
+    """낙상방지 시스템 페이지"""
+    return render(request, "member/fall_prevention.html")

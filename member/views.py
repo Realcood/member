@@ -6,20 +6,20 @@ from .models import Member
 
 
 def index(request):
-    context = {}
-    # context['m_id'] = request.session['m_id']
-    # context['m_name'] = request.session['m_name']
+    """메인 페이지"""
+    context = {
+        "m_id": request.session.get("m_id", ""),
+        "m_name": request.session.get("m_name", ""),
+    }
+    return render(request, "member/index.html", context)
 
-    # m_id 세션변수 값이 없다면 '' 을 넣어라
-    context['m_id'] = request.session.get('m_id', '')
-    context['m_name'] = request.session.get('m_name', '')
 
-    return render(request, 'member/index.html', context)
-
+@csrf_exempt
 def member_reg(request):
+    """회원가입 기능"""
     if request.method == "GET":
-        return render(request, 'member/member_reg.html')
-    
+        return render(request, "member/member_reg.html")
+
     elif request.method == "POST":
         member_id = request.POST.get("member_id")
         passwd = request.POST.get("passwd")
@@ -28,13 +28,21 @@ def member_reg(request):
 
         # 회원가입 중복 체크
         if Member.objects.filter(member_id=member_id).exists():
-            return render(request, 'member/member_reg.html', {"message": f"{member_id}가 중복됩니다."})
-        
-        # 회원 생성
-        Member.objects.create(member_id=member_id, passwd=passwd, name=name, email=email)
+            return render(request, "member/member_reg.html", {"message": f"{member_id}는 이미 존재하는 아이디입니다."})
 
-        return redirect('index')  # 회원가입 후 메인 페이지로 이동
+        # 회원 정보 저장
+        member = Member.objects.create(
+            member_id=member_id,
+            passwd=passwd,
+            name=name,
+            email=email
+        )
 
+        # 회원가입 로그 기록
+        UserLog.objects.create(member=member, action="signup")
+
+        # 회원가입 완료 후 낙상방지 템플릿으로 이동
+        return render(request, "member/fall_prevention.html", {"member_name": name})
 def member_login(request):
     if request.method == "GET":
         return render(request, 'member/login.html')
@@ -65,8 +73,11 @@ def member_login(request):
 
             context['message'] = "로그인 정보가 맞지않습니다.\\n\\n확인하신 후 다시 시도해 주십시오."
             return render(request, 'member/login.html', context)
+        
 
+        
 
 def member_logout(request):
     request.session.flush()
     return redirect('/member/')
+

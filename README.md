@@ -1,6 +1,13 @@
-# Django_SimpleCustomMemberLogin (made by 함수형뷰)
-Django 초간단 사용자 정의 회원가입, 로그인, 로그아웃 
+📌 Django 기반 낙상 감지 시스템 (Human Pose Estimation)
 
-member라는 임의의 Custom 회원테이블을 이용합니다.
+🚀 프로젝트 개요
 
-<img width="981" alt="스크린샷 2022-05-11 오후 5 17 10" src="https://user-images.githubusercontent.com/64471681/167802531-9ec83ec6-02de-4eb7-b3b7-cc57cac77727.png">
+본 프로젝트는 Django를 기반으로 Human Pose Estimation을 활용하여 실시간으로 낙상을 감지하는 시스템입니다. OpenCV와 MediaPipe를 사용하여 영상 속 인체의 자세를 분석하고, 특정 패턴을 감지하여 낙상 여부를 판단합니다.
+
+🔧 기술 스택
+
+Backend: Django, Django REST Framework
+
+Frontend: HTML, CSS, JavaScript (optional: React.js)
+
+Machine Learning: MediaPipe Pose, OpenCV
